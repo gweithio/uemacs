@@ -20,6 +20,7 @@
 #include "version.h"
 #include "wrapper.h"
 #include "utf8.h"
+#include "usage.h"
 
 struct video {
 	int v_flag;		/* Flags */
@@ -88,12 +89,23 @@ void vtinit(void)
 	TTkopen();		/* open the keyboard */
 	TTrev(FALSE);
 	vscreen = xmalloc(term.t_mrow * sizeof(struct video *));
+    if (!vscreen) {
+        die("failed to init display data structures");
+    }
 
 #if	MEMMAP == 0 || SCROLLCODE
 	pscreen = xmalloc(term.t_mrow * sizeof(struct video *));
+    if (!pscreen) {
+        die("failed to init display data structures");
+    }
+
 #endif
 	for (i = 0; i < term.t_mrow; ++i) {
 		vp = xmalloc(sizeof(struct video) + term.t_mcol*4);
+        vp = xmalloc(sizeof(struct video) + term.t_mcol*4);
+        if (!vp) {
+            die("failed to init display data structures");
+        }
 		vp->v_flag = 0;
 #if	COLOR
 		vp->v_rfcolor = 7;
@@ -102,6 +114,9 @@ void vtinit(void)
 		vscreen[i] = vp;
 #if	MEMMAP == 0 || SCROLLCODE
 		vp = xmalloc(sizeof(struct video) + term.t_mcol*4);
+        if (!vp) {
+            die("failed to init display data structures");
+        }
 		vp->v_flag = 0;
 		pscreen[i] = vp;
 #endif
